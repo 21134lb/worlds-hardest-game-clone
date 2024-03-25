@@ -2,7 +2,8 @@
 // worlds hardest game clone
 /*******************************************************/
 let currentScreen = 'game';
-const PLAYERSPEED = 2.5;
+const PLAYERSPEED = 3;
+const BALLSPEED = 3.5;
 
 const SPAWNPOINTWIDTH = 115;
 const SPAWNPOINTHEIGHT = 130;
@@ -10,6 +11,7 @@ const SPAWNPOINTY = 200;
 const SPAWNPOINTX = 100;
 
 let blueBalls;
+let upperBallsDirection = 'down';
 /*******************************************************/
 // setup()
 /*******************************************************/
@@ -37,6 +39,9 @@ function setup() {
     const BRIDGEAREAY = 200;
     const BRIDGEAREAX = 400;
     
+    ballToucherBot = new Sprite (400, 320, 500, 1,'n')
+    ballToucherTop = new Sprite (400, 80, 500, 1,'n')
+    
     bridgeArea = new Sprite(BRIDGEAREAX, BRIDGEAREAY, BRIDGEAREAWIDTH, BRIDGEAREAHEIGHT, 'n');
     bridgeArea.color = 'white'
     
@@ -49,31 +54,30 @@ function setup() {
     endPoint = new Sprite(ENDPOINTX, ENDPOINTY, ENDPOINTWIDTH, ENDPOINTHEIGHT, 'n');
     endPoint.color = 'lightgreen'
     
-    walkWallTop = new Sprite(400, 70, 400, 0,'k')
-    walkWallBot = new Sprite(400, 330, 400, 0,'k')
-    walkWallLeftTop = new Sprite(200, 120, 0, 100,'k')
-    walkWallLeftBot = new Sprite(200, 280, 0, 100,'k')
-    walkWallRightTop = new Sprite(600, 120, 0, 100,'k')
-    walkWallRightBot = new Sprite(600, 280, 0, 100,'k')
+    walkWallTop = new Sprite(400, 70, 400, 1,'k')
+    walkWallBot = new Sprite(400, 330, 400, 1,'k')
+    walkWallLeftTop = new Sprite(200, 120, 1, 100,'k')
+    walkWallLeftBot = new Sprite(200, 280, 1, 100,'k')
+    walkWallRightTop = new Sprite(600, 120, 1, 100,'k')
+    walkWallRightBot = new Sprite(600, 280, 1, 100,'k')
     
-    rightBridgeTop = new Sprite(622, 174, 44, 0,'k')
-    rightBridgeBot = new Sprite(622, 226, 44, 0,'k')
+    rightBridgeTop = new Sprite(622, 174, 44, 1,'k')
+    rightBridgeBot = new Sprite(622, 226, 44, 1,'k')
     
-    leftBridgeTop = new Sprite(178, 174, 44, 0,'k')
-    leftBridgeBot = new Sprite(178, 226, 44, 0,'k')
+    leftBridgeTop = new Sprite(178, 174, 44, 1,'k')
+    leftBridgeBot = new Sprite(178, 226, 44, 1,'k')
     
-    spawnWallTop = new Sprite(100, 135, 115,0,'k')
-    spawnWallBot = new Sprite(100, 265, 115,0,'k')
-    spawnWallLeft = new Sprite(44, 200, 0, 130,'k')
-    spawnWallRightBot = new Sprite(156, 245, 0, 40,'k')
-    spawnWallRightTop = new Sprite(156, 155, 0, 40,'k')
+    spawnWallTop = new Sprite(100, 135, 115,1,'k')
+    spawnWallBot = new Sprite(100, 265, 115,1,'k')
+    spawnWallLeft = new Sprite(44, 200, 1, 130,'k')
+    spawnWallRightBot = new Sprite(156, 245, 1, 40,'k')
+    spawnWallRightTop = new Sprite(156, 155, 1, 40,'k')
     
-    endWallTop = new Sprite(700, 135, 115,0,'k')
-    endWallBot = new Sprite(700, 265, 115,0,'k')
-    endWallRight = new Sprite(756, 200, 0, 130,'k')
-    endWallLeftBot = new Sprite(644, 245, 0, 40,'k')
-    endWallLeftTop = new Sprite(644, 155, 0, 40,'k')
-    
+    endWallTop = new Sprite(700, 135, 115, 1,'k')
+    endWallBot = new Sprite(700, 265, 115, 1,'k')
+    endWallRight = new Sprite(756, 200, 1, 130,'k')
+    endWallLeftBot = new Sprite(644, 245, 1, 40,'k')
+    endWallLeftTop = new Sprite(644, 155, 1, 40,'k')
     
     player = new Sprite(PLAYERSPAWNX, PLAYERSPAWNY , PLAYERWIDTH, PLAYERHEIGHT, 'd');
     player.color = 'red';
@@ -97,8 +101,6 @@ function setup() {
 	lowerBalls.amount = 5;
     lowerBalls.collider ='n';
     
-    upperBallsMove();
-    lowerBallsMove();
 }
 
 /*******************************************************/
@@ -137,18 +139,21 @@ function gameScreen(){
     }
     balls.overlaps(player, youDead);
     
+    ballToucherBot.overlaps(upperBalls, upperBallsUp);
+    ballToucherTop.overlaps(upperBalls, upperBallsDown);
     
 }
-async function upperBallsMove() {
-	await upperBalls.move(225,'down',3);
-	await upperBalls.move(225,'up',3);
-    upperBallsMove();
+function upperBallsUp(upperballs, ballToucherBot) {
+    upperBalls.vel.y = -BALLSPEED;
+    lowerBalls.vel.y = BALLSPEED;
+    upperBallsDirection = 'up'
 }
-async function lowerBallsMove() {
-	await lowerBalls.move(225,'up',3);
-	await lowerBalls.move(225,'down',3);
-    lowerBallsMove();
+function upperBallsDown(upperballs, ballToucherTop) {
+    upperBalls.vel.y = BALLSPEED;
+    lowerBalls.vel.y = -BALLSPEED;
+    upperBallsDirection = 'down'
 }
+
 function youDead(balls, player) {
     player.x = SPAWNPOINTX;
     player.y = SPAWNPOINTY;
